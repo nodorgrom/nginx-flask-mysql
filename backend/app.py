@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template, url_for
 import mysql.connector
 
 
@@ -19,7 +19,7 @@ class DBManager:
     def populate_db(self):
         self.cursor.execute('DROP TABLE IF EXISTS blog')
         self.cursor.execute('CREATE TABLE blog (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255))')
-        self.cursor.executemany('INSERT INTO blog (id, title) VALUES (%s, %s);', [(i, 'Blog post #%d'% i) for i in range (1,5)])
+        self.cursor.executemany('INSERT INTO blog (id, title) VALUES (%s, %s);', [(i, 'Blog post #%d'% i) for i in range (1,9)])
         self.connection.commit()
     
     def query_titles(self):
@@ -34,18 +34,33 @@ server = Flask(__name__)
 conn = None
 
 @server.route('/')
+@server.route('/home')
 def listBlog():
     global conn
     if not conn:
         conn = DBManager(password_file='/run/secrets/db-password')
         conn.populate_db()
-    rec = conn.query_titles()
+    records = conn.query_titles()
 
-    response = ''
-    for c in rec:
-        response = response  + '<div>   Hello  ' + c + '</div>'
-    return response
+    return render_template('index.html', records=records)
+
+
+@server.route('/login')
+def login():
+    return render_template('login.html')
+
+
+@server.route('/register')
+@server.route('/user/register')
+def register():
+    return render_template('register.html')
+
+
+@server.route('/user/get/<int:id>')
+def user(id):
+    return 'User ID {}'.format(id)
+
 
 
 if __name__ == '__main__':
-    server.run()
+    server.run(debug=True)

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+App | HOME
+{% endblock %}
+
+
+{% block body %}
+<div class="home">
+    <div>APP | HOME</div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+    {% for record in records %}
+        <tr>
+            <td>>>></td>
+            <td>{{ record }}</td>
+        </tr>
+    {% endfor %}
+{% endblock %}
